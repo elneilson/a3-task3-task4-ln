@@ -1,0 +1,101 @@
+---
+title: "Task 3 & 4"
+author: "Larissa Neilson"
+date: "11/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(kableExtra)
+library(lubridate)
+```
+
+## Read in urchins dataset and make column names coding friendly
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+urchins <- read.csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+```
+
+## Exploratory data visualization
+
+Histogram of urchin size distribution
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = urchins, aes(x = size)) +
+  geom_histogram(bins = 15) +
+  labs(x = "Size (cm)",
+       y = "Count") +
+  facet_wrap(~ common_name)
+```
+
+The purple urchin size distribution is positively skewed and narrow, while the red urchin size distribution is slightly positively skewed with a broader distribution. I don't think I would consider this data to be normally distributed.
+
+Boxplot of urchin size distribution 
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = urchins, aes(x = common_name, y = size)) +
+  geom_boxplot() +
+  labs(x = NULL,
+       y = "Size (cm)")
+```
+
+The average size of purple urchins is a little above 4 cm, while the red urchins are generally much bigger, at ~7 cm.
+
+# Create a descriptive statistics table of urchin data
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+urchin_stats <- urchins %>%
+  group_by(common_name) %>% 
+  summarize(mean_size = mean(size),
+            sd_size = sd(size),
+            n = n())
+  kbl(urchin_stats) %>% 
+  kable_styling()
+```
+The first thing I notice about these statistics is that the sample size for purple urchins is much larger than for red urchins, which is probably why we see a smaller standard deviation for purple urchins (1.18) versus red urchins (1.89).
+
+## Exploring purple urchin counts by site and year
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+purple_urchins <- urchins %>% 
+  filter(common_name == "Purple Urchin") %>% 
+  mutate(date_new = ymd(date)) %>%
+  mutate(year_new = year(date_new)) %>% 
+  mutate(site_full = case_when(
+    site == "NAPL" ~ "Naples Reef",
+    site == "AQUE" ~ "Arroyo Quemado Reef",
+    site == "CARP" ~ "Carpinteria Reef",
+    site == "MOHK" ~ "Mohawk Reef",
+    site == "IVEE" ~ "Isla Vista Reef"
+  ))
+
+```
+
+Purple urchins summary table
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+purple_urchin_stats <- purple_urchins %>% 
+  group_by(site_full, year_new) %>% 
+  count(common_name)
+kbl(purple_urchin_stats) %>% 
+  kable_styling()
+```
+
+## Exploratory column graph of purple urchins
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = purple_urchin_stats, aes(x = year_new, y = n)) +
+         geom_col(aes(fill = site_full,
+                      show.legend = FALSE)) +
+  labs(x = "Year", y = " Urchin Count") +
+  scale_x_continuous(breaks = c(2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012)) +
+  coord_flip() +
+  facet_wrap(~site_full) +
+  theme(legend.position = "none")
+```
+
