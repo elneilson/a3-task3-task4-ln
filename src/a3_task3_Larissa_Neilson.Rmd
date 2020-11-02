@@ -1,5 +1,5 @@
 ---
-title: "Task 3 & 4"
+title: "Task 3: Santa Barbara urchins"
 author: "Larissa Neilson"
 date: "11/1/2020"
 output: html_document
@@ -48,16 +48,21 @@ The average size of purple urchins is a little above 4 cm, while the red urchins
 
 # Create a descriptive statistics table of urchin data
 
+Then quickly calculate the actual difference in mean sizes vs. the percent difference of mean sizes between the species.
+
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 urchin_stats <- urchins %>%
-  group_by(common_name) %>% 
+  group_by(common_name) %>%
   summarize(mean_size = mean(size),
             sd_size = sd(size),
             n = n())
   kbl(urchin_stats) %>% 
   kable_styling()
+  
+  6.776489 - 4.46979
+  (6.776489 - 4.46979)/ (4.46979) * 100
 ```
-The first thing I notice about these statistics is that the sample size for purple urchins is much larger than for red urchins, which is probably why we see a smaller standard deviation for purple urchins (1.18) versus red urchins (1.89).
+The actual difference of mean sizes between purple and red urchins is ~2.3 cm. The percent difference of mean sizes is 51% which tells me that the  sample means are quite different from each other. I also notice that the sample size for purple urchins is much larger than for red urchins, which is probably why we see a smaller standard deviation for purple urchins (1.18) versus red urchins (1.89).
 
 ## Exploring purple urchin counts by site and year
 
