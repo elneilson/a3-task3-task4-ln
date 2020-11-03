@@ -14,7 +14,7 @@ library(kableExtra)
 library(lubridate)
 ```
 
-## Read in urchins dataset and make column names coding friendly
+## Read in urchins dataset and convert column names to tidy format
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 urchins <- read.csv(here("data", "urchins.csv")) %>% 
@@ -23,7 +23,7 @@ urchins <- read.csv(here("data", "urchins.csv")) %>%
 
 ## Exploratory data visualization
 
-Histogram of urchin size distribution by species
+### Histogram of urchin size distribution by species
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = urchins, aes(x = size)) +
@@ -35,7 +35,7 @@ ggplot(data = urchins, aes(x = size)) +
 
 The purple urchin size distribution is positively skewed and narrow, while the red urchin size distribution is slightly positively skewed with a broader distribution. I don't think I would consider this data to be normally distributed.
 
-Boxplot of urchin size distribution by species
+### Boxplot of urchin size distribution by species
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = urchins, aes(x = common_name, y = size)) +
