@@ -11,6 +11,7 @@ library(tidyverse)
 library(here)
 library(janitor)
 library(lubridate)
+library(kableExtra)
 ```
 
 ## Read in urchins dataset and convert column names to tidy format
@@ -20,9 +21,9 @@ urchins <- read.csv(here("data", "urchins.csv")) %>%
   clean_names()
 ```
 
-## Create subset including only Naples Reef observations for purple urchins observedi n January 2010
+## Create subset including only Naples Reef observations for purple urchins observed in January 2010
 
-Begin by creating a subset with new month and year columns, then make desired subset
+Begin by creating a subset with new month and year columns, and a new site column with the full name of the site, then make the desired subset
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 purple_urchins_dates <- urchins %>%
@@ -39,7 +40,7 @@ purple_urchins_napl_2010 <- purple_urchins_dates %>%
 
 ## Exploratory graphs of Naple Reef observations for purple urchins in January 2010
 
-Histogram of purple urchin size distribution by treatment
+### Histogram of purple urchin size distribution by treatment
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = purple_urchins_napl_2010, aes(x = size)) +
@@ -49,7 +50,9 @@ ggplot(data = purple_urchins_napl_2010, aes(x = size)) +
   facet_wrap(~ treatment)
 ```
 
-QQ-plot of purple urchin size distribution by treatment
+The size distribution for urchins under the annual treatment seems to be positively skewed while the control treatment distribution is slightly more normalized. I would not consider these samples to be normally distributed.
+
+### QQ-plot of purple urchin size distribution by treatment
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = purple_urchins_napl_2010, aes(sample = size)) +
@@ -57,7 +60,13 @@ ggplot(data = purple_urchins_napl_2010, aes(sample = size)) +
   facet_wrap(~ treatment)
 ```
 
-```{r}
+Clear positive skew in both treatments, but more so for the annual sample. I would not consider this data to be normally distributed.
+
+## Create descriptive statistics table for both treatment groups
+
+Then quickly calculate the actual difference in mean sizes vs. the percent difference of mean sizes between the two treatment groups.
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 purple_urchin_control_stats <- purple_urchins_napl_2010 %>%
   group_by(treatment) %>% 
   summarize(mean_size = mean(size),
@@ -65,11 +74,14 @@ purple_urchin_control_stats <- purple_urchins_napl_2010 %>%
             n = n(), .groups = 'drop')
 kbl(purple_urchin_control_stats) %>% 
   kable_styling()
+
+3.916667 - 3.725807
+(3.916667 - 3.725807) / 3.725807
 ```
 
 ## Split treatments into different sample groups, and pull sample vectors
 
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 annual_sample <- purple_urchins_napl_2010 %>% 
   filter(treatment == "ANNUAL") %>% 
   pull(size)
@@ -81,8 +93,13 @@ control_sample <- purple_urchins_napl_2010 %>%
 
 ## Run two-sample t-test with the two treatment vectors as inputs
 
-```{r}
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
 t.test(annual_sample, control_sample)
 ```
+The means of these two samples (annual and control treatments) are quite similar, with only a five percent difference between them. This  tells me that it is somewhat likely that they could have been drawn from populations with the same mean.
 
+The p-value is a probability that tells me that if these samples are drawn from populations with the same mean size, then there is approximately a 25% chance that I could have taken two random samples from those populations and found samples at least as different as the samples that I have here.
 
+This tells me that it is possible that I could have retrieved my samples from populations with the same mean, but it is uncertain.
+
+Further observations are necessary with sample sizes larger than n = 60, 62 to make a more concrete conclusion of the data.
