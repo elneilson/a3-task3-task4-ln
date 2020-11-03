@@ -23,7 +23,7 @@ urchins <- read.csv(here("data", "urchins.csv")) %>%
 
 ## Exploratory data visualization
 
-Histogram of urchin size distribution
+Histogram of urchin size distribution by species
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = urchins, aes(x = size)) +
@@ -35,7 +35,7 @@ ggplot(data = urchins, aes(x = size)) +
 
 The purple urchin size distribution is positively skewed and narrow, while the red urchin size distribution is slightly positively skewed with a broader distribution. I don't think I would consider this data to be normally distributed.
 
-Boxplot of urchin size distribution 
+Boxplot of urchin size distribution by species
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 ggplot(data = urchins, aes(x = common_name, y = size)) +
@@ -69,7 +69,7 @@ The actual difference of mean sizes between purple and red urchins is ~2.3 cm. T
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 purple_urchins <- urchins %>% 
   filter(common_name == "Purple Urchin") %>% 
-  mutate(date_new = ymd(date)) %>%
+  mutate(date_new = mdy(date)) %>%
   mutate(year_new = year(date_new)) %>% 
   mutate(site_full = case_when(
     site == "NAPL" ~ "Naples Reef",
@@ -98,8 +98,6 @@ ggplot(data = purple_urchin_stats, aes(x = year_new, y = n)) +
          geom_col(aes(fill = site_full,
                       show.legend = FALSE)) +
   labs(x = "Year", y = " Urchin Count") +
-  scale_x_continuous(breaks = c(2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012)) +
-  coord_flip() +
   facet_wrap(~site_full) +
   theme(legend.position = "none")
 ```

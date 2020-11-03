@@ -1,0 +1,88 @@
+---
+title: 'Task 4: Naples Reef purple urchins'
+author: "Larissa Neilson"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+## Read in urchins dataset and convert column names to tidy format
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+urchins <- read.csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+```
+
+## Create subset including only Naples Reef observations for purple urchins observedi n January 2010
+
+Begin by creating a subset with new month and year columns, then make desired subset
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+purple_urchins_dates <- urchins %>%
+  mutate(date_new = mdy(date)) %>%
+  mutate(year_new = year(date_new)) %>% 
+  mutate(month_new =  month(date_new)) %>% 
+  mutate(site_new = case_when(
+    site == "NAPL" ~ "Naples Reef"))
+
+purple_urchins_napl_2010 <- purple_urchins_dates %>%
+  filter(common_name == "Purple Urchin", site_new == "Naples Reef",
+         month_new == 1, year_new == 2010)
+```
+
+## Exploratory graphs of Naple Reef observations for purple urchins in January 2010
+
+Histogram of purple urchin size distribution by treatment
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = purple_urchins_napl_2010, aes(x = size)) +
+  geom_histogram(bins = 8) +
+  labs(x = "Size (cm)",
+       y = "Count") +
+  facet_wrap(~ treatment)
+```
+
+QQ-plot of purple urchin size distribution by treatment
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+ggplot(data = purple_urchins_napl_2010, aes(sample = size)) +
+  geom_qq() +
+  facet_wrap(~ treatment)
+```
+
+```{r}
+purple_urchin_control_stats <- purple_urchins_napl_2010 %>%
+  group_by(treatment) %>% 
+  summarize(mean_size = mean(size),
+            sd_size = sd(size),
+            n = n(), .groups = 'drop')
+kbl(purple_urchin_control_stats) %>% 
+  kable_styling()
+```
+
+## Split treatments into different sample groups, and pull sample vectors
+
+```{r}
+annual_sample <- purple_urchins_napl_2010 %>% 
+  filter(treatment == "ANNUAL") %>% 
+  pull(size)
+
+control_sample <- purple_urchins_napl_2010 %>% 
+  filter(treatment == "CONTROL") %>% 
+  pull(size)
+```
+
+## Run two-sample t-test with the two treatment vectors as inputs
+
+```{r}
+t.test(annual_sample, control_sample)
+```
+
+
