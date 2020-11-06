@@ -33,7 +33,7 @@ ggplot(data = urchins, aes(x = size)) +
   facet_wrap(~ common_name)
 ```
 
-The purple urchin size distribution is positively skewed and narrow, while the red urchin size distribution is slightly positively skewed with a broader distribution. I don't think I would consider this data to be normally distributed.
+The purple urchin size distribution is positively skewed and narrow, while the red urchin size distribution is slightly positively skewed with a broader distribution. I wouldn't consider this data to be normally distributed.
 
 ### Boxplot of urchin size distribution by species
 
@@ -44,7 +44,7 @@ ggplot(data = urchins, aes(x = common_name, y = size)) +
        y = "Size (cm)")
 ```
 
-I think the most important aspect of these boxplots are the outliers present in both species groups, which further leads me to believe that the data are not normally distributed.
+One important aspect of these boxplots are the outliers present in both species groups, which further leads me to believe that the data are not normally distributed.
 
 # Create a descriptive statistics table of urchin data
 
